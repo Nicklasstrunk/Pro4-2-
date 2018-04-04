@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title>Fly to a location based on scroll position</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            margin-left: 25px;
+            padding: 25px 25px;
+            color: #fff;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        #map {
+            position: fixed;
+            width: 50%;
+        }
+
+        #features {
+            width: 50%;
+            margin-left: 50%;
+            font-family: sans-serif;
+            overflow-y: scroll;
+            background-color: #000;
+            padding-bottom: 300px;
+        }
+
+        section {
+            padding: 25px 50px;
+            line-height: 25px;
+            border-bottom: 1px solid #ddd;
+            opacity: 0.90;
+            font-size: 13px;
+            background-color: #000;
+            color: antiquewhite;
+        }
+
+        section.active {
+            opacity: 1;
+            background-color: brown;
+            color: antiquewhite;
+        }
+
+        section:last-child {
+            border-bottom: none;
+            margin-bottom: 600px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div id='map'></div>
+
+    <div id='features'>
+        <h2>Blood Diamond</h2>
+        <section id='newyork' class='active'>
+            <h3>New York - Wall Street</h3>
+            <ul>
+                <li>Starten på handel af bloddiamanter starter i New York. Wall Street ser en chance for fortjeneste fremfor den ligitime vej </li>
+                <br>
+                <li>Der bliver undersøgt muligheder ved brug af slavearbejde</li>
+                <br>
+                <li>Der bliver påbegyndt arbejde med Sydafrikanske slavehandlere</li>
+            </ul>
+        </section>
+        <section id='mozambique'>
+            <h3>Mozambique - South Africa</h3>
+            <p>Påbegyndelse af minearbejde i Mozambique, Sydafrika</p>
+        </section>
+        <section id='london'>
+            <h3>London - England</h3>
+            <ul>
+                <li>Bloddiamanterne bliver solgt videre til London</li>
+            </ul>
+            <p>"Her bliver der set en mulighed for, at sælge diamanterne videre så det fremstår ligitimt"</p>
+        </section>
+        <section id='berlin'>
+            <h3>Berlin - Germany</h3>
+            <p>Diamanterne ender i Berlin, hvorpå de endnu engang bliver solgt videre</p>
+
+        </section>
+        <section id='china'>
+            <h3>Beijing - China</h3>
+            <ul>
+                <li>Diamanterne bliver herfra slebet ned til mindre udgaver</li>
+                <li>Stenene bliver brugt til forskellige produkter</li>
+            </ul>
+            <p>Herfra bliver produkterne sendt videre ud i den vestilige verden til profit</p>
+        </section>
+    </div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1Ijoibmlja2xhc25zbiIsImEiOiJjamZqb2pudnQ1YWZhMnFrNzhua3lxdTNqIn0.Xa0McFKoi1YqRzFO9xEXBA';
+
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/nicklasnsn/cjfktwa17gvud2rmvti8atvsy',
+            center: [-74.008366, 40.706133],
+            zoom: 10,
+            bearing: 56,
+            pitch: 33
+        });
+
+        // object with places and geographic positions
+        var chapters = {
+            'newyork': {
+                bearing: 27,
+                center: [-74.008366, 40.706133],
+                zoom: 16,
+                pitch: 20
+            },
+            'mozambique': {
+                duration: 7000,
+                center: [30.790489, -29.841137],
+                bearing: 150,
+                zoom: 15,
+                pitch: 0
+            },
+            'london': {
+                bearing: 90,
+                center: [-0.127500, 51.507220],
+                zoom: 17,
+                speed: 0.6,
+                pitch: 40
+            },
+            'berlin': {
+                bearing: 23,
+                center: [13.383330, 52.516670],
+                zoom: 14
+            },
+            'china': {
+                bearing: -45,
+                center: [116.391390, 39.905000],
+                zoom: 15.3,
+                pitch: 20,
+                speed: 0.5
+            }
+        };
+
+
+        // On every scroll event, check which element is on screen
+        window.onscroll = function() {
+            var chapterNames = Object.keys(chapters);
+            for (var i = 0; i < chapterNames.length; i++) {
+                var chapterName = chapterNames[i];
+                if (isElementOnScreen(chapterName)) {
+                    setActiveChapter(chapterName);
+                    break;
+                }
+            }
+        };
+
+        var activeChapterName = 'newyork';
+
+        function setActiveChapter(chapterName) {
+            if (chapterName === activeChapterName) return;
+
+            map.flyTo(chapters[chapterName]);
+
+            document.getElementById(chapterName).setAttribute('class', 'active');
+            document.getElementById(activeChapterName).setAttribute('class', '');
+
+            activeChapterName = chapterName;
+        }
+
+        function isElementOnScreen(id) {
+            var element = document.getElementById(id);
+            var bounds = element.getBoundingClientRect();
+            return bounds.top < window.innerHeight && bounds.bottom > 0;
+        }
+
+    </script>
+
+</body>
+
+</html>
